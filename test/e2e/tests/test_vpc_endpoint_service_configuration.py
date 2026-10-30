@@ -59,6 +59,8 @@ def simple_vpc_endpoint_service_configuration(request):
             test_resource_values["TAG_KEY"] = data["tag_key"]
         if 'tag_value' in data:
             test_resource_values["TAG_VALUE"] = data["tag_value"]
+        if 'network_load_balancer' in data:
+            test_resource_values["NETWORK_LOAD_BALANCER_ARN_SET"] = getattr(resources, data["network_load_balancer"]).arn
 
     # Load VPC Endpoint Service Configuration CR
     resource_data = load_ec2_resource(
@@ -217,7 +219,7 @@ class TestVpcEndpointServiceConfiguration:
         # Check VPC Endpoint Service no longer exists in AWS
         ec2_validator.assert_vpc_endpoint_service_configuration(resource_id, exists=False)
 
-    @pytest.mark.resource_data({'tag_key': 'initialtagkey', 'tag_value': 'initialtagvalue'})
+    @pytest.mark.resource_data({'tag_key': 'initialtagkey', 'tag_value': 'initialtagvalue', 'network_load_balancer': 'SupportedRegionsNetworkLoadBalancer'})
     def test_vpc_endpoint_service_configuration_supported_regions(self, ec2_client, simple_vpc_endpoint_service_configuration):
         (ref, cr) = simple_vpc_endpoint_service_configuration
 

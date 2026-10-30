@@ -36,7 +36,14 @@ def service_bootstrap() -> Resources:
         FlowLogsBucket=Bucket(
             "ack-ec2-controller-flow-log-tests",
         ),
+        # A Network Load Balancer can back only one endpoint service at a
+        # time. AWS can still count it as in use more than 12 minutes after
+        # DeleteVpcEndpointServiceConfigurations accepts the delete, as seen
+        # in an ec2-kind-e2e run. Each test in
+        # test_vpc_endpoint_service_configuration.py uses its own load
+        # balancer, so neither test waits for a service the other created.
         NetworkLoadBalancer=NetworkLoadBalancer("e2e-vpc-ep-service-test"),
+        SupportedRegionsNetworkLoadBalancer=NetworkLoadBalancer("e2e-vpc-ep-service-regions"),
         AdoptedVPC=VPC(name_prefix="e2e-adopted-vpc", num_public_subnet=1, num_private_subnet=0),
         TestTransitGateway=TransitGateway(),
         AdoptedVpcEndpointService=VpcEndpointServiceConfiguration(name_prefix="e2e-adopted-vpc-es"),

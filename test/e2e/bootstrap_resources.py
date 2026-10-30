@@ -28,6 +28,7 @@ class BootstrapResources(Resources):
     SharedTestVPC: VPC
     AdoptedVPC: VPC
     NetworkLoadBalancer: NetworkLoadBalancer
+    SupportedRegionsNetworkLoadBalancer: NetworkLoadBalancer
     TestTransitGateway: TransitGateway
     AdoptedVpcEndpointService: VpcEndpointServiceConfiguration
 
