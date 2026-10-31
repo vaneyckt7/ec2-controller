@@ -255,10 +255,13 @@ func (rm *resourceManager) sdkFind(
 
 	rm.setStatusDefaults(ko)
 
+	mirrorSecurityGroupIDs(ko)
+
 	if vpcEndpointPending(&resource{ko}) {
 		// Setting resource synced condition to false will trigger a requeue of
 		// the resource. No need to return a requeue error here.
-		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, nil, nil)
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse,
+			aws.String("VPC endpoint is "+*ko.Status.State+", waiting for it to become available"), nil)
 	}
 
 	return &resource{ko}, nil
@@ -476,6 +479,19 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	// The resource now exists in AWS and ko carries its identifiers. Mark any
+	// error from here on as a post-create failure so the reconciler retains the
+	// ACK finalizer, and return ko so those identifiers reach the CR status and
+	// the next reconciliation finds the resource instead of creating a second
+	// one. See https://github.com/aws-controllers-k8s/community/issues/2849.
+	defer func() {
+		if err != nil {
+			err = ackerr.WrapPostCreateError(err)
+			if created == nil {
+				created = &resource{ko}
+			}
+		}
+	}()
 
 	// Setting resource synced condition to false will trigger a requeue of
 	// the resource. No need to return a requeue error here.
