@@ -44,6 +44,11 @@ func TestSdkDelete(t *testing.T) {
 			wantErr:      "api error OperationNotPermitted: The service configuration cannot be deleted.",
 		},
 		{
+			name:         "EC2 does not delete the service configuration and gives no error",
+			unsuccessful: `<item><resourceId>vpce-svc-0123</resourceId></item>`,
+			wantErr:      "api error UnsuccessfulItem: EC2 did not delete vpce-svc-0123",
+		},
+		{
 			name:         "EC2 no longer has the service configuration",
 			unsuccessful: `<item><error><code>InvalidVpcEndpointService.NotFound</code><message>The VPC endpoint service does not exist.</message></error><resourceId>vpce-svc-0123</resourceId></item>`,
 		},

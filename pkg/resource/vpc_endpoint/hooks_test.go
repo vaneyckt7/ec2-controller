@@ -169,6 +169,11 @@ func TestSdkDelete(t *testing.T) {
 			wantErr:      "api error OperationNotPermitted: The endpoint cannot be deleted.",
 		},
 		{
+			name:         "EC2 does not delete the endpoint and gives no error",
+			unsuccessful: `<item><resourceId>vpce-0123</resourceId></item>`,
+			wantErr:      "api error UnsuccessfulItem: EC2 did not delete vpce-0123",
+		},
+		{
 			name:         "EC2 no longer has the endpoint",
 			unsuccessful: `<item><error><code>InvalidVpcEndpoint.NotFound</code><message>The VPC endpoint does not exist.</message></error><resourceId>vpce-0123</resourceId></item>`,
 		},
